@@ -1,0 +1,300 @@
+[
+  {
+    "name": "welcome",
+    "frame": {
+      "t": "welcome",
+      "name": "alpha",
+      "kind": "claude-code",
+      "round": 0,
+      "peers": [
+        {"name": "beta", "kind": "opencode", "role": "Tests", "state": "idle"},
+        {"name": "frank", "kind": "observer", "role": "", "state": "idle"}
+      ],
+      "limits": {"rate": "6/60s", "max_rounds": 24}
+    },
+    "lines": [
+      "[moot] joined as alpha (claude-code) · peers: beta (opencode, Tests, idle), frank (observer, idle) · round 0/24"
+    ]
+  },
+  {
+    "name": "welcome without own kind, no peers, no limits",
+    "frame": {"t": "welcome", "name": "beta", "round": 7, "peers": []},
+    "lines": ["[moot] joined as beta · peers: none · round 7"]
+  },
+  {
+    "name": "deliver: direct, broadcast and overheard in one frame",
+    "frame": {
+      "t": "deliver",
+      "round": 3,
+      "msgs": [
+        {
+          "id": 41,
+          "from": "frank",
+          "to": "*",
+          "addressing": "broadcast",
+          "kind": "note",
+          "text": "alpha: propose a root cause. beta: refute it.",
+          "ts": 1755859200.12,
+          "seq": 9
+        },
+        {
+          "id": 42,
+          "from": "beta",
+          "to": "alpha",
+          "addressing": "direct",
+          "kind": "question",
+          "text": "which migration ran last?",
+          "ts": 1755859203.44,
+          "seq": 3
+        },
+        {
+          "id": 43,
+          "from": "beta",
+          "to": "frank",
+          "addressing": "overheard",
+          "kind": "answer",
+          "text": "the index is missing",
+          "ts": 1755859205.01,
+          "seq": 4
+        }
+      ]
+    },
+    "lines": [
+      "[r3 #41] frank → * · note: alpha: propose a root cause. beta: refute it.",
+      "[r3 #42] beta → alpha · question: which migration ran last?",
+      "[context #43] beta → frank · answer: the index is missing"
+    ]
+  },
+  {
+    "name": "deliver: system message with multi-line text, verbatim",
+    "frame": {
+      "t": "deliver",
+      "round": 4,
+      "msgs": [
+        {
+          "id": 44,
+          "from": "system",
+          "to": "alpha",
+          "addressing": "direct",
+          "kind": "note",
+          "text": "mute is on:\nagent-to-agent messages are rejected.",
+          "ts": 1755859210.0,
+          "seq": 0
+        }
+      ]
+    },
+    "lines": [
+      "[r4 #44] system → alpha · note: mute is on:\nagent-to-agent messages are rejected."
+    ]
+  },
+  {
+    "name": "deliver: id 0 and a missing id carry no #tag",
+    "frame": {
+      "t": "deliver",
+      "round": 5,
+      "msgs": [
+        {
+          "id": 0,
+          "from": "system",
+          "to": "alpha",
+          "addressing": "direct",
+          "kind": "note",
+          "text": "3 addressed messages dropped while you were busy",
+          "ts": 0.0,
+          "seq": 0
+        },
+        {
+          "id": 0,
+          "from": "system",
+          "to": "*",
+          "addressing": "overheard",
+          "kind": "note",
+          "text": "2 older messages omitted",
+          "ts": 0.0,
+          "seq": 0
+        },
+        {
+          "from": "beta",
+          "to": "alpha",
+          "addressing": "direct",
+          "kind": "question",
+          "text": "which one dropped?",
+          "ts": 1755859220.5,
+          "seq": 6
+        }
+      ]
+    },
+    "lines": [
+      "[r5] system → alpha · note: 3 addressed messages dropped while you were busy",
+      "[context] system → * · note: 2 older messages omitted",
+      "[r5] beta → alpha · question: which one dropped?"
+    ]
+  },
+  {
+    "name": "deliver: a private message carries the marker, for the recipient and for an observer's copy",
+    "frame": {
+      "t": "deliver",
+      "round": 5,
+      "msgs": [
+        {
+          "id": 46,
+          "from": "alpha",
+          "to": "beta",
+          "addressing": "direct",
+          "private": true,
+          "kind": "claim",
+          "text": "raid gamma with me",
+          "ts": 1755859220.0,
+          "seq": 5
+        },
+        {
+          "id": 47,
+          "from": "alpha",
+          "to": "beta",
+          "addressing": "overheard",
+          "private": true,
+          "kind": "claim",
+          "text": "raid gamma with me",
+          "ts": 1755859220.0,
+          "seq": 5
+        }
+      ]
+    },
+    "lines": [
+      "[r5 #46] alpha → beta · private · claim: raid gamma with me",
+      "[context #47] alpha → beta · private · claim: raid gamma with me"
+    ]
+  },
+  {
+    "name": "deliver: private false renders exactly like absent",
+    "frame": {
+      "t": "deliver",
+      "round": 5,
+      "msgs": [
+        {
+          "id": 48,
+          "from": "beta",
+          "to": "alpha",
+          "addressing": "direct",
+          "private": false,
+          "kind": "answer",
+          "text": "no",
+          "ts": 1755859221.0,
+          "seq": 6
+        },
+        {
+          "id": 49,
+          "from": "beta",
+          "to": "alpha",
+          "addressing": "direct",
+          "kind": "answer",
+          "text": "no",
+          "ts": 1755859221.0,
+          "seq": 7
+        }
+      ]
+    },
+    "lines": [
+      "[r5 #48] beta → alpha · answer: no",
+      "[r5 #49] beta → alpha · answer: no"
+    ]
+  },
+  {
+    "name": "welcome: an observer peer never shows its role",
+    "frame": {
+      "t": "welcome",
+      "name": "alpha",
+      "kind": "claude-code",
+      "round": 2,
+      "peers": [
+        {"name": "frank", "kind": "observer", "role": "human observer", "state": "idle"},
+        {"name": "gamma", "kind": "opencode", "role": "", "state": "busy"}
+      ]
+    },
+    "lines": [
+      "[moot] joined as alpha (claude-code) · peers: frank (observer, idle), gamma (opencode, busy) · round 2"
+    ]
+  },
+  {
+    "name": "event with extra fields",
+    "frame": {"t": "event", "event": "round_limit", "round": 24, "max_rounds": 24},
+    "lines": ["[event] round_limit · round=24 max_rounds=24"]
+  },
+  {
+    "name": "event without extra fields",
+    "frame": {"t": "event", "event": "frozen"},
+    "lines": ["[event] frozen"]
+  },
+  {
+    "name": "err",
+    "frame": {
+      "t": "err",
+      "code": "rate_limited",
+      "detail": "rate limit",
+      "retry_after": 8.2,
+      "seq": 17
+    },
+    "lines": ["[err] rate_limited · rate limit · retry in 8.2s"]
+  },
+  {
+    "name": "err without a retry_after",
+    "frame": {"t": "err", "code": "frozen", "detail": "hub is frozen", "seq": 4},
+    "lines": ["[err] frozen · hub is frozen"]
+  },
+  {
+    "name": "ok renders to nothing",
+    "frame": {"t": "ok", "queued": 2, "seq": 17},
+    "lines": []
+  },
+  {
+    "name": "roster",
+    "frame": {
+      "t": "roster",
+      "round": 7,
+      "max_rounds": 24,
+      "frozen": false,
+      "muted": false,
+      "seq": 3,
+      "goal": "find the regression",
+      "peers": [
+        {
+          "name": "alpha",
+          "kind": "claude-code",
+          "role": "diagnosis",
+          "state": "busy",
+          "idle_for": 0.0,
+          "busy_for": 250.0,
+          "finished": false,
+          "queued": 2,
+          "queued_from": ["beta", "frank"],
+          "dropped": 0,
+          "context": 4,
+          "blocked_detail": null
+        },
+        {
+          "name": "frank",
+          "kind": "observer",
+          "role": "human observer",
+          "state": "idle",
+          "idle_for": 72.0,
+          "busy_for": 0.0,
+          "finished": false,
+          "queued": 0,
+          "queued_from": [],
+          "dropped": 0,
+          "context": 0,
+          "blocked_detail": null
+        }
+      ]
+    },
+    "lines": [
+      "[roster] alpha (claude-code, busy)",
+      "[roster] frank (observer, idle)"
+    ]
+  },
+  {
+    "name": "ping is handled by the transport, not rendered",
+    "frame": {"t": "ping"},
+    "lines": []
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "name": "moot-opencode",
+  "private": true,
+  "type": "module",
+  "description": "Lets `bun test opencode/` resolve @opencode-ai/plugin — and the symlinked plugin too: OpenCode resolves the import from the symlink target, so `bun install` here is required for the symlink install (docs/MANUAL-TEST.md).",
+  "dependencies": {
+    "@opencode-ai/plugin": "1.18.11"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.0"
+  }
+}
